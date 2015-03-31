@@ -1,8 +1,10 @@
 # HasScrubbedAttribute
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/has_scrubbed_attribute`. To experiment with that code, run `bin/console` for an interactive prompt.
+Prevent unwanted (and unsafe) HTML input from users before it enters your database by marking specific attributes on ActiveRecord models to be scrubbed of HTML markup before validations run.
 
-TODO: Delete this and the text above, and describe your gem
+Sanitizing is done using the [loofah](https://github.com/flavorjones/loofah) gem
+
+Tested on Ruby versions 1.9.3, 2.0.x, 2.1.x, and 2.2.x with ActiveRecord 3.2 - 4.2.
 
 ## Installation
 
@@ -22,13 +24,31 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Simply include the gem in any ActiveRecord model and tell it which attributes you want to scrub clear of HTML.
 
-## Development
+```ruby
+class Post < ActiveRecord::Base
+  include HasScrubbedAttribute
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
+  has_scrubbed_attribute :title
+  has_scrubbed_attribute :subtitle
+end
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+```irb
+post = Post.new
+post.title = "<strong>Some title</strong>"
+post.subtitle = "I have markup <em>too!</em>"
+post.save
+post.title
+=> "Some title"
+post.subtitle
+=> "I have markup too!"
+```
+
+## Testing
+
+Run tests with `bundle exec rake spec`. The tests use an in-memory SQLite3 database.
 
 ## Contributing
 
