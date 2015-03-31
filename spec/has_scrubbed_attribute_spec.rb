@@ -12,7 +12,6 @@ describe HasScrubbedAttribute do
     post = Post.new
     post.content = WITH_HTML
     post.save!
-    post.reload
     expect(post.content).to eq(WITHOUT_HTML)
   end
 end
